@@ -1,0 +1,44 @@
+
+//tworzenie tabeli i kluczy obcych
+CREATE TABLE rozliczenia_2.pracownicy(
+	id_pracownika serial  PRIMARY KEY,
+	imie char,
+	nazwisko char,
+	adres char,
+	telefon integer
+);
+CREATE TABLE rozliczenia_2.godziny(
+	id_godziny serial PRIMARY KEY,
+	liczba_godzin integer,
+	id_pracownika integer
+	) ;
+CREATE TABLE rozliczenia_2.pensje(
+	id_pensji serial PRIMARY KEY,
+	stanowisko char,
+	kwota integer,
+	id_premii integer
+	
+);
+CREATE TABLE rozliczenia_2.premie(
+	id_premii serial PRIMARY KEY,
+	rodzaj char,
+	kwota integer
+);
+ALTER TABLE godziny ADD FOREIGN KEY (id_pracownika) REFERENCES pracownicy(id_pracownika);
+ALTER TABLE pensje ADD FOREIGN KEY (id_premii) REFERENCES premie(id_premii);
+
+//zapytania
+
+//szukamy nazwisk i adresow pracownikow
+SELECT nazwisko, adres FROM rozliczenia.pracownicy
+
+
+//tworzymy kolumne netto, zmieniamy nazwe na brutto
+ALTER TABLE rozliczenia.pensje
+  RENAME kwota TO kwota_brutto;
+
+ALTER TABLE rozliczenia.pensje
+  ADD kwota_netto integer;
+
+//kwote netto ustawiamy na 0.8 kwoty brutto bo podatek wynosi 20%
+UPDATE rozliczenia.pensje SET kwota_netto = kwota_brutto * 0.8
