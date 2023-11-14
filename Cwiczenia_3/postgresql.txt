@@ -1,0 +1,72 @@
+CREATE SCHEMA rozliczenia
+//tworzenie tabeli i kluczy obcych
+CREATE TABLE rozliczenia.pracownicy(
+	id_pracownika serial  PRIMARY KEY,
+	imie varchar(25),
+	nazwisko varchar(25),
+	adres varchar(25),
+	telefon integer
+);
+CREATE TABLE rozliczenia.godziny(
+	id_godziny serial PRIMARY KEY,
+	liczba_godzin integer,
+	id_pracownika integer
+	) ;
+
+CREATE TABLE rozliczenia.pensje(
+	id_pensji serial PRIMARY KEY,
+	stanowisko varchar(25),
+	kwota integer,
+	id_premii integer
+	
+);
+CREATE TABLE rozliczenia.premie(
+	id_premii serial PRIMARY KEY,
+	rodzaj varchar(25),
+	kwota integer
+);
+ALTER TABLE rozliczenia.godziny ADD FOREIGN KEY (id_pracownika) REFERENCES rozliczenia.pracownicy(id_pracownika);
+ALTER TABLE rozliczenia.pensje ADD FOREIGN KEY (id_premii) REFERENCES rozliczenia.premie(id_premii);
+ 
+ALTER TABLE rozliczenia.godziny 
+ADD data date;
+
+//wprowadzamy dane
+
+
+INSERT INTO rozliczenia.pracownicy (id_pracownika, imie, nazwisko, adres, telefon)
+VALUES (1,'Gabriel','R','Warszawska',500), (2,'Michał', 'Warz','Zorska',200),(3,'Maciej','Bukowski','Budryka',670), (4,'Marcin', 'Schmidt','Wodzislawska',404),(5,'Grzegorz','Brzeczyszczykiewicz','Kwiatowa',677), (6,'Weronika', 'Schmit','Polna',900),(7,'Karoline','Polska','Jana Pawla 2',123), (8,'Patryk', 'Gorny','Topolowa',990),(9,'Mikolaj','Too','Psaidn',532), (10,'Jakub', 'Osaj','Ajfa',127)
+INSERT INTO rozliczenia.godziny (liczba_godzin, id_pracownika,data)
+VALUES (2,4,'2017-12-12'),(4,6,'2017-12-13'),(8,3,'2017-12-12'),(8,1,'2017-12-12'),
+(8,10,'2017-12-13'),(12,3,'2017-12-14'),(12,1,'2017-12-15'),
+(8,4,'2017-12-12'),(8,7,'2017-12-13'),(8,3,'2017-12-13')
+INSERT INTO rozliczenia.premie (rodzaj, kwota)
+VALUES ('dodatek',100),('dodatek',200),('dodatek',300),
+('dodatek',400),('dodatek',50),('premia',100),('premia',150),
+('premia',200),('premia',22),('premia',70)
+INSERT INTO rozliczenia.pensje (stanowisko, kwota, id_premii)
+VALUES ('szef',2000,3),('pracownik',800,6),('pracownik',1000,8),
+('pracownik',700,1),('pracownik',800,10),('pracownik',1200,9),('menedzer',1200,2),
+('informatyk',1500,8),('technik',1300,9),('menedzer',1500,2)
+
+
+//zapytania
+
+//szukamy nazwisk i adresow pracownikow
+SELECT nazwisko, adres FROM rozliczenia.pracownicy
+
+//datepart
+SELECT 
+DATEPART(DW, data) AS dzien_tygodnia,
+DATEPART(mm, data) AS dzien_mies
+FROM rozliczenia.godziny;
+
+//tworzymy kolumne netto, zmieniamy nazwe na brutto
+ALTER TABLE rozliczenia.pensje
+  RENAME kwota TO kwota_brutto;
+
+ALTER TABLE rozliczenia.pensje
+  ADD kwota_netto integer;
+
+//kwote netto ustawiamy na 0.8 kwoty brutto bo zakladamy ze podatek wynosi 20%
+UPDATE rozliczenia.pensje SET kwota_netto = kwota_brutto * 0.8
