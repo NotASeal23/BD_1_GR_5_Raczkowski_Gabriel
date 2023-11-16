@@ -1,0 +1,188 @@
+//cw1
+
+//cw2
+CREATE SCHEMA ksiegowosc
+
+//cw3
+CREATE TABLE ksiegowosc.pracownicy(
+	id_pracownika serial  PRIMARY KEY,
+	imie varchar(25),
+	nazwisko varchar(25),
+	adres varchar(25),
+	telefon integer
+);
+CREATE TABLE ksiegowosc.godziny(
+	id_godziny serial PRIMARY KEY,
+	data date,
+	liczba_godzin integer,
+	id_pracownika integer
+	) ;
+
+CREATE TABLE ksiegowosc.pensje(
+	id_pensji serial PRIMARY KEY,
+	stanowisko varchar(25),
+	kwota integer
+);
+CREATE TABLE ksiegowosc.premie(
+	id_premii serial PRIMARY KEY,
+	rodzaj varchar(25),
+	kwota integer
+);
+CREATE TABLE ksiegowosc.wynagrodzenie(
+	id_wynagrodzenia serial PRIMARY KEY,
+	data date,
+	id_pracownika integer,
+	id_pensji integer,
+	id_premii integer
+);
+ALTER TABLE ksiegowosc.godziny ADD FOREIGN KEY (id_pracownika)
+REFERENCES ksiegowosc.pracownicy(id_pracownika);
+ALTER TABLE ksiegowosc.wynagrodzenie ADD FOREIGN KEY (id_pracownika)
+REFERENCES ksiegowosc.pracownicy(id_pracownika);
+ALTER TABLE ksiegowosc.wynagrodzenie ADD FOREIGN KEY (id_pensji)
+REFERENCES ksiegowosc.pensje(id_pensji);
+ALTER TABLE ksiegowosc.wynagrodzenie ADD FOREIGN KEY (id_premii)
+REFERENCES ksiegowosc.premie(id_premii);
+
+COMMENT ON TABLE ksiegowosc.godziny IS 'godziny'
+//cw4
+
+INSERT INTO ksiegowosc.pracownicy (imie, nazwisko, adres, telefon)
+VALUES ('Gabriel','R','Warszawska',500), ('Michał', 'Warz','Zorska',200),('Maciej','Bukowski','Budryka',670), ('Marcin', 'Schmidt','Wodzislawska',404),('Grzegorz','Brzeczyszczykiewicz','Kwiatowa',677), ('Weronika', 'Schmit','Polna',900),('Karoline','Polska','Jana Pawla 2',123), ('Patryk', 'Gorny','Topolowa',990),('Mikolaj','Too','Psaidn',532), ('Jakub', 'Osaj','Ajfa',127)
+INSERT INTO ksiegowosc.godziny (liczba_godzin, id_pracownika,data)
+VALUES (2,4,'2017-12-12'),(4,6,'2017-12-13'),(8,3,'2017-12-12'),(8,1,'2017-12-12'),
+(8,10,'2017-12-13'),(12,3,'2017-12-14'),(12,1,'2017-12-15'),
+(8,4,'2017-12-12'),(8,7,'2017-12-13'),(8,3,'2017-12-13')
+INSERT INTO ksiegowosc.premie (rodzaj, kwota)
+VALUES ('dodatek',100),('dodatek',200),('dodatek',300),
+('dodatek',400),('dodatek',50),('premia',100),('premia',150),
+('premia',200),('premia',22),('premia',70)
+INSERT INTO ksiegowosc.pensje (stanowisko, kwota)
+VALUES ('szef',2000),('pracownik',800),('pracownik',1000),
+('pracownik',700),('pracownik',800),('pracownik',1200),('menedzer',1200),
+('informatyk',1500),('technik',1300),('menedzer',1500)
+INSERT INTO ksiegowosc.wynagrodzenie (data,id_pracownika,id_pensji,id_premii)
+VALUES ('2017-12-15',1,4,5),('2017-12-15',2,1,6),('2017-12-15',3,5,3),
+('2017-12-15',4,1,5),('2017-12-15',5,10,4),('2017-12-15',6,3,8),('2017-12-15',7,1,9),
+('2017-12-15',8,5,2),('2017-12-15',9,3,10),('2017-12-15',10,1,7)
+
+///cw5
+//a
+SELECT id_pracownika, nazwisko FROM ksiegowosc.pracownicy
+
+//b
+SELECT id_pracownika FROM ksiegowosc.pracownicy
+WHERE id_pracownika 
+IN (SELECT id_pracownika FROM ksiegowosc.wynagrodzenie
+WHERE id_pensji IN (
+SELECT id_pensji FROM ksiegowosc.pensje
+WHERE kwota > 1000)) 
+
+//c
+SELECT id_pracownika FROM ksiegowosc.pracownicy
+WHERE id_pracownika 
+IN (SELECT id_pracownika FROM ksiegowosc.wynagrodzenie
+WHERE id_pensji IN (
+SELECT id_pensji FROM ksiegowosc.pensje
+WHERE kwota > 2000)) AND  
+id_pracownika 
+IN (SELECT id_pracownika FROM ksiegowosc.wynagrodzenie
+WHERE id_premii = NULL)
+
+//d
+SELECT * FROM ksiegowosc.pracownicy
+WHERE imie LIKE 'J%'
+
+//e
+SELECT * FROM ksiegowosc.pracownicy
+WHERE imie LIKE '%a' AND nazwisko LIKE '%n%'
+
+//f
+ALTER TABLE ksiegowosc.godziny
+ADD COLUMN nadgodziny integer
+
+UPDATE ksiegowosc.godziny
+SET nadgodziny = liczba_godzin - 160 WHERE nadgodziny > 160
+UPDATE ksiegowosc.godziny
+SET nadgodziny = 0 WHERE nadgodziny <= 160
+
+
+SELECT pracownicy.imie, pracownicy.nazwisko, godziny.nadgodziny  FROM ksiegowosc.pracownicy, ksiegowosc.godziny 
+
+//g
+SELECT imie, nazwisko FROM ksiegowosc.pracownicy
+WHERE id_pracownika IN (SELECT id_pracownika
+FROM ksiegowosc.wynagrodzenie WHERE
+id_pensji IN (SELECT id_pensji 
+FROM ksiegowosc.pensje WHERE kwota >1500 AND kwota < 3000)) 
+
+//h
+SELECT pracownicy.imie, pracownicy.nazwisko
+FROM ksiegowosc.pracownicy
+WHERE id_pracownika IN 
+(SELECT id_pracownika FROM 
+ ksiegowosc.godziny WHERE nadgodziny = 0)
+AND 
+id_pracownika IN 
+(SELECT id_pracownika FROM 
+ ksiegowosc.wynagrodzenie
+ WHERE id_premii > 0 AND id_premii <= 10)
+
+//i
+SELECT imie,nazwisko, pracownicy.id_pracownika
+FROM ksiegowosc.pracownicy 
+INNER JOIN ksiegowosc.wynagrodzenie ON wynagrodzenie.id_pracownika = pracownicy.id_pracownika
+INNER JOIN ksiegowosc.pensje ON pensje.id_pensji = wynagrodzenie.id_pensji
+ORDER BY pensje.kwota DESC
+
+
+//j
+SELECT imie,nazwisko, pracownicy.id_pracownika, pensje.kwota, premie.kwota
+FROM ksiegowosc.pracownicy 
+INNER JOIN ksiegowosc.wynagrodzenie ON wynagrodzenie.id_pracownika = pracownicy.id_pracownika
+INNER JOIN ksiegowosc.pensje ON pensje.id_pensji = wynagrodzenie.id_pensji
+INNER JOIN ksiegowosc.premie ON premie.id_premii = wynagrodzenie.id_premii
+ORDER BY pensje.kwota+premie.kwota DESC
+
+
+//k
+SELECT COUNT(*), stanowisko FROM
+ksiegowosc.pensje GROUP BY stanowisko
+
+//l
+
+SELECT COUNT(*), AVG(kwota),MIN(kwota),MAX(kwota), stanowisko FROM
+ksiegowosc.pensje
+WHERE stanowisko ='menedzer'
+GROUP BY stanowisko
+
+
+//m
+SELECT SUM(kwota) FROM
+ksiegowosc.pensje
+
+
+
+//n
+SELECT SUM(kwota),stanowisko FROM
+ksiegowosc.pensje
+
+GROUP BY stanowisko
+
+
+
+//o
+SELECT SUM(premie.kwota),stanowisko FROM
+ksiegowosc.pensje
+INNER JOIN ksiegowosc.wynagrodzenie ON wynagrodzenie.id_pensji = pensje.id_pensji
+INNER JOIN ksiegowosc.premie ON premie.id_premii = wynagrodzenie.id_premii
+GROUP BY stanowisko
+
+
+
+//p
+
+DELETE FROM ksiegowosc.pracownicy
+INNER JOIN ksiegowosc.wynagrodzenie ON wynagrodzenie.id_pracownika = pracownicy.id_pracownika
+INNER JOIN ksiegowosc.pensje ON pensje.id_pensji = wynagrodzenie.id_pensji
+WHERE pensje.kwota < 1200;
