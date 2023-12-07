@@ -1,0 +1,101 @@
+#zad2
+Tabela1 :
+
+T1:
+IDPracownika  IDPacjenta IDZabiegu DataWizyty   GodzinaWizyty
+S1011	       P100       Z500     12.03.2020   10.00
+S1011          P105	  Z496     12.03.2020   13.00
+S1011	       P108       Z500     14.03.2020   10.00
+S1024	       P108	  Z503	   16.03.2020   17.00
+S1045	       P120	  Z500     18.03.2020   09.00
+S1034	       P130       Z496     20.03.2020   08.00
+S1034	       P123	  Z503     12.03.2020   15.00
+T2:
+IDPracownika ImieLekarza NazwiskoLekarza
+S1011        Maria 	 Nowak
+S1024	     Jan 	 Kowalski
+S1045        Anna	 Jabłońska
+S1034	     Marek 	 Potocki
+T3:
+IDPacjenta ImiePacjenta 	NazwiskoPacjenta
+P100       Anna 		Jeleń
+P105	   Jarosław 		Nicpoń
+p108	   Joanna 		Nosek
+P120       Jan			Kałuża
+P130       Jerzy		Lis
+P123	   Olga			Nowacka
+T3:
+IDZabiegu NazwaZabiegu
+Z500      Borowanie
+Z496      Lakowanie
+Z503      Usuwanie Kamienia
+
+
+Tabela2:
+T1:
+IDTranzakcji IDProduktu   Dostawca  		  Cena
+1            1  	 Makarony Polskie	  130
+2	     1  	 Lubelski Makaron	  150
+3	     2	 	 Polskie Przetwory        200
+4	     2		 Przetwory Pomidorowe     220
+5	     3		 Polskie Przetwory	  89
+6 	     3		 Małopolskie Smaki	  110
+
+T2:
+Dostawca  		UlicaDostawcy		KodPocztowyDostawcy	MiastoDostawcy
+Makarony Polskie	Turystyczna 40	 	31-435 			Kraków  
+Lubelski Makaron	Piłsudzkiego 332a 	04-242 			Lublin
+Polskie Przetwory	Wojska Polskiego 44a	31-342			Kraków
+Przetwory Pomidorowe	Rolnicza 22/4 		30-243 			Tarnów
+Małopolskie Smaki	Mickiewicza 223/77 	35-434 			Nowy Targ
+T3:
+IDProduktu	NazwaProduktu
+1		Makaron Nitki
+2		Keczup Pikantny
+3		Sos pomidorowy 
+
+
+zad1
+
+
+a)
+UPDATE ksiegowosc.pracownicy
+SET telefon = CONCAT('(+48)' , telefon)
+
+b)
+UPDATE ksiegowosc.pracownicy
+SET telefon = CONCAT('(+48)' , SUBSTRING(telefon,6,3), '-',SUBSTRING(telefon,9,3), '-',SUBSTRING(telefon,12,3))
+
+
+c)
+SELECT UPPER(pracownicy.nazwisko)
+FROM ksiegowosc.pracownicy
+WHERE length(pracownicy.nazwisko) = (SELECT max(length(pracownicy.nazwisko)) FROM ksiegowosc.pracownicy)
+
+d)
+SELECT MD5('ksiegowosc.pracownicy.nazwisko'), MD5('pensje.kwota')
+FROM ksiegowosc.pracownicy 
+LEFT JOIN ksiegowosc.wynagrodzenie w ON pracownicy.id_pracownika=w.id_pracownika
+LEFT JOIN ksiegowosc.pensje ON w.id_pensji=pensje.id_pensji
+
+e)
+SELECT ksiegowosc.pracownicy.nazwisko, premie.kwota, pensje.kwota
+FROM ksiegowosc.pracownicy 
+LEFT JOIN ksiegowosc.wynagrodzenie w ON pracownicy.id_pracownika=w.id_pracownika
+LEFT JOIN ksiegowosc.premie ON w.id_premii=premie.id_premii
+LEFT JOIN ksiegowosc.pensje ON w.id_pensji=pensje.id_pensji
+
+
+f)
+SELECT (CONCAT('Pracownik ',pracownicy.imie,' ',pracownicy.nazwisko,
+			  ', w dniu ', godziny.data, 'otrzymal pensje calkowita na kwote ',
+			  pensje.kwota, 'zl, gdzie wynagrodzenie zasadnicze wynosilo 5000zl, premia: 2000zl')) AS Report
+FROM ksiegowosc.pracownicy 
+LEFT JOIN ksiegowosc.wynagrodzenie w ON pracownicy.id_pracownika=w.id_pracownika
+LEFT JOIN ksiegowosc.premie ON w.id_premii=premie.id_premii
+LEFT JOIN ksiegowosc.pensje ON w.id_pensji=pensje.id_pensji
+LEFT JOIN ksiegowosc.godziny ON pracownicy.id_pracownika=godziny.id_pracownika
+
+
+
+
