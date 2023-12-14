@@ -1,0 +1,73 @@
+1)
+
+pierwsza funkcja, wypisuje n-ty wyraz ciagu fibonacciego 
+parametry wejsciowe :  integer n
+nazwa:  fibonacci
+typ wyjscia: integer
+
+BEGIN 
+	IF n = 0 THEN
+	RETURN 0;
+	END IF;
+	IF n = 1 THEN 
+	RETURN 1;
+	END IF;
+	RETURN fibonacci(n-1) + fibonacci(n-2);
+END;
+
+druga funckja
+parametry wejsc: n
+nazwa: fib
+typ wyjscia: setof int
+
+
+DECLARE
+	i INT := 0;
+BEGIN
+	FOR i IN 0..n-1 LOOP
+		return NEXT ksiegowosc.fibonacci(i);
+	END LOOP;
+	RETURN;
+END;
+
+
+procedura
+nazwa: fibpro
+param wejsc: int n
+SELECT ksiegowosc.fib(n)
+
+
+
+
+2 trigger
+CREATE FUNCTION DML() RETURNS TRIGGER AS
+$$
+BEGIN 
+ NEW.lastname := UPPER(NEW.lastname);
+ RETURN NEW;
+ END;
+ $$ LANGUAGE plpgsql;
+ 
+ CREATE TRIGGER DMLT
+ BEFORE INSERT OR UPDATE ON 
+ person.person
+ FOR EACH ROW 
+ EXECUTE FUNCTION DML();
+
+
+3 trigger
+CREATE FUNCTION tablen.taxratemonitoring() RETURNS TRIGGER AS
+$$
+BEGIN 
+IF NEW.taxrate < OLD.taxrate * 0.7 THEN
+RAISE EXCEPTION 'blad'
+END IF
+RETURN NEW
+ END;
+ $$ LANGUAGE plpgsql;
+ 
+ CREATE TRIGGER trm
+ BEFORE INSERT OR UPDATE ON 
+ tablen.taxrate
+ FOR EACH ROW 
+ EXECUTE FUNCTION tablen.taxratemonitoring();
