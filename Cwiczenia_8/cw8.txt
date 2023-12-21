@@ -1,0 +1,24 @@
+#1)
+WITH TempEmployeeInfo AS(
+SELECT e.rate AS high_rate, p.businessentityid AS ID, CONCAT(p.firstname,' ', p.lastname) AS Name
+FROM person.person p
+JOIN humanresources.employeepayhistory e ON p.businessentityid = e.businessentityid
+WHERE e.rate = (SELECT MAX(rate) AS high_rate FROM humanresources.employeepayhistory)
+)
+
+SELECT * FROM TempEmployeeInfo
+
+#2)
+WITH TempTable AS (
+SELECT businessentityid,firstname,lastname 
+FROM person.person)
+
+SELECT c.customerid,c.territoryid AS customerterritoryid,
+CONCAT(t.firstname,' ',t.lastname) AS salespersoninthisterritory
+FROM TempTable t
+JOIN sales.salesperson s
+ON s.businessentityid = t.businessentityid
+JOIN sales.salesterritory st
+ON st.territoryid = s.territoryid
+JOIN sales.customer c
+ON c.territoryid = st.territoryid;
