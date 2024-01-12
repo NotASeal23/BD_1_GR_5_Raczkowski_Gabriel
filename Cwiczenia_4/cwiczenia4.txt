@@ -1,5 +1,7 @@
 //cw1
 
+Już jest stworzona
+
 //cw2
 CREATE SCHEMA ksiegowosc
 

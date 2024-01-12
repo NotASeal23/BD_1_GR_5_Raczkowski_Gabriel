@@ -4,12 +4,8 @@ suma_netto, VAT -> suma_brutto
 id_klienta -> nazwa_klienta,data_zamowienia, nazwa_produktu, id_produktu
 
 #2
-klucze kandydujące:
-1) id_produktu
-2) id_zamowienia
-3) nazwa_produktu
-4) nazwa_klienta
-
+1)nazawa produktu, nazwa klienta, data zamowienia
+2)id produktu, id klienta , data zamowienia
 
 #3
 miasto, ulica -> kod_pocztowy

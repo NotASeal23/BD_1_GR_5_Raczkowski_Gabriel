@@ -1,0 +1,57 @@
+
+
+#zad1)
+"Hash Join  (cost=415.95..1581.22 rows=279 width=44) (actual time=5.029..8.970 rows=486 loops=1)"
+"  Hash Cond: (soh.customerid = c.customerid)"
+"  ->  Seq Scan on salesorderheader soh  (cost=0.00..1082.65 rows=31465 width=32) (actual time=0.008..1.432 rows=31465 loops=1)"
+"  ->  Hash  (cost=413.75..413.75 rows=176 width=16) (actual time=5.013..5.013 rows=176 loops=1)"
+"        Buckets: 1024  Batches: 1  Memory Usage: 16kB"
+"        ->  Seq Scan on customer c  (cost=0.00..413.75 rows=176 width=16) (actual time=0.006..4.986 rows=176 loops=1)"
+"              Filter: (territoryid = 5)"
+"              Rows Removed by Filter: 19644"
+"Planning Time: 3.680 ms"
+"Execution Time: 9.007 ms"
+
+
+"Hash Join  (cost=183.14..1348.41 rows=279 width=44) (actual time=0.087..4.064 rows=486 loops=1)"
+"  Hash Cond: (soh.customerid = c.customerid)"
+"  ->  Seq Scan on salesorderheader soh  (cost=0.00..1082.65 rows=31465 width=32) (actual time=0.006..1.488 rows=31465 loops=1)"
+"  ->  Hash  (cost=180.94..180.94 rows=176 width=16) (actual time=0.073..0.074 rows=176 loops=1)"
+"        Buckets: 1024  Batches: 1  Memory Usage: 16kB"
+"        ->  Bitmap Heap Scan on customer c  (cost=5.65..180.94 rows=176 width=16) (actual time=0.016..0.059 rows=176 loops=1)"
+"              Recheck Cond: (territoryid = 5)"
+"              Heap Blocks: exact=24"
+"              ->  Bitmap Index Scan on idx_territoryid  (cost=0.00..5.61 rows=176 width=0) (actual time=0.009..0.010 rows=176 loops=1)"
+"                    Index Cond: (territoryid = 5)"
+"Planning Time: 0.228 ms"
+"Execution Time: 4.105 ms"
+
+
+
+
+W pierszym wypadku, przed dodaniem indexów całe zapytanie trwa dłuzej, niż po ich dodaniu.
+Wynika to z tego, że indexy pomagają w przeszukiwaniu tabeli sales.
+Zatem w sytuacjach w których często pzeszukiwamy daną tabelę, warto stworzyć indexy, by zaoszczędzić czas.
+
+
+
+
+#zad2)
+
+1)
+BEGIN;
+UPDATE Production.Product p SET p.ListPrice = p.ListPrice*1.1
+WHERE  ProductID = 680;
+COMMIT;
+
+2)
+BEGIN;
+DELETE FROM Production.Product p WHERE p.ProductID = 707;
+ROLLBACK;
+COMMIT;
+
+
+3)
+BEGIN;
+INSERT INTO Production.Product ( Name , Color )
+VALUES ( "pociąg", "zielony" )
